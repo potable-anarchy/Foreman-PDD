@@ -61,3 +61,4 @@ nextjs_app.ts
 runlist_component.ts
 convex_schema.ts
 convex_functions.ts
+.vercel
