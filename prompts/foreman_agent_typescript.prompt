@@ -1,0 +1,104 @@
+# GOAL
+Build an AI "Foreman Agent" that reads a Product Design Document (PDD), uses the `pdd` CLI to generate and test runnable projects, and coordinates its workflow using sponsor tools from the SFTechWeek Agent Builders Hackathon.
+
+The agent should:
+- Parse `.prompt` or `.md` design docs
+- Execute `pdd generate`, `pdd sync`, and `pdd fix`
+- Retry on failure (up to 3 times)
+- Track all runs, tasks, and logs in Convex
+- Display build progress using Vibe Kanban
+- Speak build milestones via ElevenLabs
+- Render a system diagram using Fireworks AI
+- Be hosted/orchestrated via Dedalus Labs agent runtime
+- Run builds inside a Windsurf (Devin) workspace
+
+Deliver a live demo showing a spec → working app → voice-narrated build completion.
+
+# CONTEXT
+This project is for the $33K Agent Builders Hackathon at SF Tech Week.
+Sponsors include Dedalus Labs, Convex, OpenAI, ElevenLabs, Fireworks AI, Windsurf/Devin, and Vibe Kanban.
+
+We want to showcase integration with as many sponsors as possible, with a clear visual and audible demo flow.
+
+# STACK
+- TypeScript (Node.js)
+- Convex (backend & DB)
+- Next.js (web dashboard)
+- Dedalus Agent runtime (hosting)
+- Windsurf / Devin (build workspace)
+- ElevenLabs API (TTS)
+- Fireworks AI API (image/diagram gen)
+- Vibe Kanban API (task visualization)
+- PDD CLI (project generation & testing)
+
+# ARTIFACTS
+- `packages/foreman/cli.ts`: CLI entrypoint for running builds.
+- `packages/foreman/loop.ts`: Main agent loop orchestrating PDD + sponsor tools.
+- `packages/foreman/tools/pdd.ts`: Wrapper for executing PDD commands.
+- `packages/foreman/tools/voice.ts`: ElevenLabs integration for TTS.
+- `packages/foreman/tools/kanban.ts`: Vibe Kanban integration.
+- `packages/foreman/tools/diagram.ts`: Fireworks AI visual diagram generator.
+- `apps/api/convex/schema.ts`: Convex schema defining runs, tasks, and specs.
+- `apps/api/convex/runs.ts`: Convex functions to log build progress.
+- `apps/web/pages/index.tsx`: Dashboard UI with Kanban + logs.
+- `dedalus/agent.yaml`: Manifest defining the Foreman Agent and its tool capabilities.
+- `prompts/foreman_agent.prompt`: This design document.
+- `README.md`: Setup + demo instructions.
+
+# FUNCTIONAL REQUIREMENTS
+- Parse and validate `.prompt` or `.md` input.
+- Use Dedalus Agents to orchestrate build flow and connect tools.
+- Execute `pdd generate`, then `pdd sync` with a configurable `--budget`.
+- Automatically invoke `pdd fix` for failed tests.
+- Log all runs in Convex (`runs`, `tasks`, `specs` tables).
+- Update a Vibe Kanban board with task states.
+- Announce key milestones via ElevenLabs voice.
+- Generate an architecture diagram via Fireworks AI.
+- Expose HTTP endpoints `/api/runs` and `/api/tasks` for UI consumption.
+- Host agent and dashboard on Dedalus Labs.
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Should complete a small PDD build (<500 lines) within 15 minutes.
+- Limit total cost via PDD’s `--budget` parameter.
+- Reliable retries (max 3 full loops).
+- Minimal dependencies and easy setup.
+- Fully reproducible runs using Convex-stored metadata.
+- Secure API key handling via `.env` and Dedalus secrets.
+- All outputs must be deterministic and logged.
+
+# CONSTRAINTS
+- Use only sponsor tech for integrations where possible.
+- Must produce a functioning build demo within the hackathon timeframe.
+- No external services beyond sponsor stack.
+- Output must be viewable and audible during live judging.
+- Keep initial artifact count ≤12 for fast generation.
+
+# STRETCH_GOALS
+- Multi-agent collaboration (e.g., TesterAgent, DocsAgent).
+- Slack/Discord webhook notifications.
+- Auto-deploy finished builds to Render or Vercel.
+- Multi-modal output (audio + image + dashboard).
+
+# TESTS
+- `tests/cli.test.ts`: verifies CLI parsing and PDD command execution.
+- `tests/convex.test.ts`: confirms runs and tasks log correctly.
+- `tests/voice.test.ts`: mocks ElevenLabs API and checks narration calls.
+- `tests/kanban.test.ts`: validates Vibe Kanban API calls.
+- `tests/pdd_loop.test.ts`: runs mock `pdd sync` and checks retry logic.
+- Coverage target: 80%
+
+# VERIFICATION
+✅ `foreman` CLI runs a full PDD build successfully  
+✅ Convex logs show each run with timestamps and results  
+✅ Vibe Kanban reflects live task updates  
+✅ ElevenLabs narrates major events  
+✅ Fireworks AI generates a visual system diagram  
+✅ Dedalus hosts the running agent successfully  
+✅ Tests pass with ≥80% coverage  
+
+# NOTES
+For the demo:
+- Start with a small PDD (e.g., "Todo API with Convex + Next.js").
+- Show the build logs updating in real-time.
+- Let ElevenLabs narrate “Build complete, all tests passed.”
+- Display the Fireworks AI-generated diagram on the dashboard.

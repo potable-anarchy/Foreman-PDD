@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Convex
+.convex/
+
+# PDD
+litellm_cache.sqlite
+litellm_cache.sqlite-shm
+litellm_cache.sqlite-wal
+
+# Temporary files
+*.tmp
+.cache/
+
+# Generated files (keep source)
+demo_todo.ts
+demo_todo_example.ts
+test_demo_todo.ts
+foreman_cli*.ts
+foreman_loop.ts
+pdd_tool.ts
+voice_tool.ts
+kanban_tool.ts
+diagram_tool.ts
+nextjs_dashboard.ts
+nextjs_app.ts
+runlist_component.ts
+convex_schema.ts
+convex_functions.ts

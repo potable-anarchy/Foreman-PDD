@@ -1,0 +1,86 @@
+# GOAL
+Build an integration with Vibe Kanban API for task board visualization, with local stub fallback.
+
+**IMPORTANT**: Generate ONLY the implementation code, NOT test code. The output should be production code.
+
+# CONTEXT
+This tool updates a Kanban board to show build progress. Vibe Kanban may not be available during demo, so graceful degradation is critical.
+
+# STACK
+- TypeScript
+- axios for HTTP requests
+- Vibe Kanban API
+
+# ARTIFACTS
+- `tools/kanban.ts`: Vibe Kanban integration
+- `tools/kanban.test.ts`: Tests with mocked axios
+
+# FUNCTIONAL REQUIREMENTS
+- Accept: taskId (spec name), state, description
+- States: planning, building, testing, done, error
+- Check if VIBE_KANBAN_BASE_URL and TOKEN are set
+- If not set: log to console with 📋 emoji, use local stub
+- If set: POST to Kanban API
+  - Endpoint: `{BASE_URL}/tasks`
+  - Headers: Authorization Bearer token
+  - Body: { id, state, description, timestamp }
+  - Log success
+- Always return successfully (never throw)
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Fast timeout (5s max)
+- Fail gracefully on API errors
+- Don't block main flow
+- Clear console output showing state changes
+
+# INTERFACE
+```typescript
+export type TaskState = 'planning' | 'building' | 'testing' | 'done' | 'error';
+
+export async function updateKanban(
+  taskId: string,
+  state: TaskState,
+  description: string
+): Promise<void>
+```
+
+# API_DETAILS
+Endpoint: `POST {VIBE_KANBAN_BASE_URL}/tasks`
+Headers:
+- `Authorization`: Bearer {TOKEN}
+- `Content-Type`: application/json
+
+Body:
+```json
+{
+  "id": "demo_todo",
+  "state": "building",
+  "description": "Generating code (attempt 1)",
+  "timestamp": 1696000000000
+}
+```
+
+# ERROR_HANDLING
+- No config → use local stub (log only)
+- Network error → log warning, continue
+- Auth error → log warning, continue
+- Invalid state → log warning, continue
+
+# TESTS
+- Uses local stub when not configured
+- Calls API when configured
+- Handles all state types
+- Handles API errors gracefully
+- Never throws errors
+
+# VERIFICATION
+✅ Works without configuration (local stub)
+✅ Calls Vibe Kanban API when configured
+✅ Logs all state changes clearly
+✅ Never crashes
+✅ Tests pass with 80%+ coverage
+
+# NOTES
+- Use env vars: VIBE_KANBAN_BASE_URL, VIBE_KANBAN_TOKEN
+- Always log to console (even when API succeeds)
+- Local stub is perfectly acceptable for demo

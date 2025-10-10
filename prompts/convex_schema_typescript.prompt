@@ -1,0 +1,82 @@
+# GOAL
+Define the Convex database schema for tracking build runs, tasks, and specs.
+
+# CONTEXT
+This schema stores all build history and state. It needs to support efficient queries for the dashboard and provide complete audit trail of all builds.
+
+# STACK
+- Convex
+- TypeScript
+
+# ARTIFACTS
+- `schema.ts`: Convex schema definition
+
+# FUNCTIONAL REQUIREMENTS
+Define three tables:
+
+**runs**:
+- specName (string): Name of the spec being built
+- startedAt (number): Unix timestamp
+- endedAt (optional number): Unix timestamp
+- status (union): "planning" | "building" | "testing" | "done" | "error"
+- summary (string): Human-readable description
+- totalCost (optional number): Dollar amount
+- attempts (optional number): Number of retry attempts
+
+Indexes:
+- by_specName
+- by_status
+- by_startedAt (for chronological sorting)
+
+**tasks**:
+- runId (id<"runs">): Foreign key to run
+- title (string): Task name
+- state (union): "backlog" | "doing" | "done" | "error"
+- diffSummary (optional string): Code changes made
+- createdAt (number): Unix timestamp
+
+Indexes:
+- by_runId
+- by_state
+
+**specs**:
+- name (string): Spec filename
+- raw (string): Original prompt content
+- normalized (optional string): OpenAI-processed version
+- createdAt (number): Unix timestamp
+
+Indexes:
+- by_name
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Efficient queries for dashboard
+- Support for pagination
+- Clear field names
+- Type-safe schema
+
+# INTERFACE
+```typescript
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  runs: defineTable({ ... }),
+  tasks: defineTable({ ... }),
+  specs: defineTable({ ... }),
+});
+```
+
+# TESTS
+No separate test file needed (Convex validates schema at deploy)
+
+# VERIFICATION
+✅ Schema deploys without errors
+✅ All indexes are created
+✅ Types are correctly inferred
+✅ Queries work efficiently
+
+# NOTES
+- Use v.union for status/state enums
+- Use v.optional for nullable fields
+- Use v.id("table") for foreign keys
+- Timestamps are Unix epoch in milliseconds

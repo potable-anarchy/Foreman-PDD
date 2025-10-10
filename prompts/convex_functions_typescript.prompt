@@ -1,0 +1,88 @@
+# GOAL
+Build Convex mutations and queries for managing build runs, tasks, and specs.
+
+# CONTEXT
+These functions provide the API for creating, updating, and querying build history. They're called from the Foreman CLI and consumed by the Next.js dashboard.
+
+# STACK
+- Convex
+- TypeScript
+
+# ARTIFACTS
+- `runs.ts`: All run-related functions
+- No separate tests (Convex validates at deploy)
+
+# FUNCTIONAL REQUIREMENTS
+
+**Mutations:**
+- `createRun`: Create new run with specName, summary
+- `updateRun`: Update run status, summary, cost, attempts, endedAt
+- `createTask`: Create task within a run
+- `updateTask`: Update task state and diffSummary
+
+**Queries:**
+- `listRuns`: Get all runs (with limit, default 50), sorted by most recent
+- `getRun`: Get specific run by ID
+- `getRunsBySpec`: Get all runs for a specific spec
+- `getTasksByRun`: Get all tasks for a specific run
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Efficient queries using indexes
+- Type-safe arguments with v.* validators
+- Support pagination (limit parameter)
+- Return full objects (not partial)
+
+# INTERFACE
+```typescript
+import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
+
+// Example mutation
+export const createRun = mutation({
+  args: {
+    specName: v.string(),
+    summary: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Implementation
+  },
+});
+
+// Example query
+export const listRuns = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    // Implementation
+  },
+});
+```
+
+# VALIDATION
+- Use v.string(), v.number(), v.id(), v.union(), v.optional()
+- Validate all enum values (status, state)
+- Use descriptive argument names
+
+# QUERIES_TO_IMPLEMENT
+1. createRun(specName, summary) → runId
+2. updateRun(runId, status?, summary?, totalCost?, attempts?, endedAt?)
+3. listRuns(limit?) → Run[]
+4. getRun(runId) → Run | null
+5. getRunsBySpec(specName) → Run[]
+6. createTask(runId, title, state, diffSummary?) → taskId
+7. updateTask(taskId, state, diffSummary?)
+8. getTasksByRun(runId) → Task[]
+
+# VERIFICATION
+✅ Functions deploy without errors
+✅ Arguments are validated correctly
+✅ Queries use indexes efficiently
+✅ Updates work correctly
+✅ Returns are type-safe
+
+# NOTES
+- Auto-set timestamps (Date.now()) in mutations
+- Use withIndex() for efficient queries
+- Sort listRuns by descending startedAt
+- Use optional arguments for partial updates

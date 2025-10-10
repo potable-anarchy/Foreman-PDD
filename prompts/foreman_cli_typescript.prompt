@@ -1,0 +1,66 @@
+# GOAL
+Build a CLI entrypoint for the Foreman Agent that parses command-line arguments and triggers the orchestration loop.
+
+**IMPORTANT**: Generate ONLY the implementation code, NOT test code. The output should be production code that can be executed.
+
+# CONTEXT
+This is the main entry point that users interact with. It should be simple, clear, and handle all CLI argument parsing using the Commander library.
+
+# STACK
+- TypeScript
+- Commander (CLI framework)
+- Node.js
+
+# ARTIFACTS
+- `cli.ts`: Main CLI file with executable shebang (implementation ONLY, no tests)
+
+# FUNCTIONAL REQUIREMENTS
+- Parse command: `foreman build <spec>`
+- Accept options:
+  - `--budget <amount>`: Budget for PDD (default: 10.00)
+  - `--attempts <number>`: Max retry attempts (default: 3)
+  - `--coverage <percentage>`: Target test coverage (default: 80)
+- Load environment variables from `.env`
+- Call `runBuild()` from `loop.ts` with BuildConfig object: `{ specName, budget, maxAttempts, targetCoverage }`
+- runBuild returns BuildResult with success boolean - check it and exit appropriately
+- Display clear success/error messages with emojis
+- Exit with appropriate status codes (0 for success, 1 for error)
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Fast startup (<100ms)
+- Clear error messages
+- Unix-style argument parsing
+- Support `--help` and `--version`
+
+# INTERFACE
+```typescript
+import { runBuild } from './loop';
+
+interface BuildOptions {
+  budget: string;
+  attempts: string;
+  coverage: string;
+}
+
+// Main command handler
+async function handleBuild(spec: string, options: BuildOptions): Promise<void>
+```
+
+# TESTS
+- Parse valid arguments correctly
+- Apply default values when options omitted
+- Display help text
+- Handle invalid arguments gracefully
+- Exit with correct status codes
+
+# VERIFICATION
+✅ `./cli.js build demo_todo` executes successfully
+✅ `./cli.js --help` shows usage
+✅ `./cli.js --version` shows version
+✅ Invalid commands show helpful errors
+✅ Tests pass with 80%+ coverage
+
+# NOTES
+- Include executable shebang: `#!/usr/bin/env node`
+- Use console.log for output (not logger)
+- Keep it simple - just parse and delegate to loop.ts

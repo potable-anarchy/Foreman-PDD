@@ -1,0 +1,20 @@
+{
+  "name": "@foreman/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Convex backend for Foreman Agent",
+  "scripts": {
+    "dev": "convex dev",
+    "build": "convex deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "convex": "^1.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  }
+}

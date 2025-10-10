@@ -1,0 +1,43 @@
+**IMPORTANT**: Generate ONLY the `_app.tsx` file for Next.js. This is the app wrapper component.
+
+# GOAL
+Create the Next.js _app.tsx file that sets up the Convex provider for the entire application.
+
+# CONTEXT
+This wraps the entire Next.js app with ConvexProvider so all pages can use Convex queries.
+
+# STACK
+- Next.js 14
+- Convex React client
+- TypeScript
+
+# ARTIFACTS
+- `pages/_app.tsx`: App wrapper with Convex provider (implementation only, no tests)
+
+# FUNCTIONAL REQUIREMENTS
+- Import ConvexProvider and ConvexReactClient from 'convex/react'
+- Import AppProps from 'next/app'
+- Create ConvexReactClient instance with process.env.NEXT_PUBLIC_CONVEX_URL
+- Export default App component that wraps children with ConvexProvider
+- Pass the convex client to ConvexProvider
+
+# INTERFACE
+```typescript
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import type { AppProps } from 'next/app';
+
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <ConvexProvider client={convex}>
+      <Component {...pageProps} />
+    </ConvexProvider>
+  );
+}
+```
+
+# VERIFICATION
+✅ Creates ConvexReactClient with environment variable
+✅ Wraps app with ConvexProvider
+✅ Passes Component and pageProps correctly

@@ -1,0 +1,39 @@
+# GOAL
+Build a simple TODO list application for demonstration purposes.
+
+# CONTEXT
+This is a minimal demo app to showcase the Foreman Agent's build capabilities.
+
+# STACK
+- TypeScript
+- Node.js
+
+# ARTIFACTS
+- `demo_todo.ts`: Simple TODO list implementation
+
+# FUNCTIONAL REQUIREMENTS
+- Create a Todo interface with id, title, completed fields
+- Implement addTodo(title: string) function
+- Implement toggleTodo(id: number) function  
+- Implement listTodos() function
+- Store todos in memory (array)
+- Export all functions
+
+# INTERFACE
+```typescript
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+export function addTodo(title: string): Todo;
+export function toggleTodo(id: number): void;
+export function listTodos(): Todo[];
+```
+
+# VERIFICATION
+✅ Can add new todos
+✅ Can toggle completion status
+✅ Can list all todos
+✅ TypeScript types are correct

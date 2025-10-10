@@ -1,0 +1,90 @@
+# GOAL
+Build the main orchestration loop that coordinates PDD execution with sponsor tool integrations and retry logic.
+
+**IMPORTANT**: Generate ONLY the implementation code, NOT test code. The output should be production code.
+
+# CONTEXT
+This is the heart of the Foreman Agent. It executes the PDD CLI, monitors results, retries on failure, and coordinates all sponsor integrations (Convex, ElevenLabs, Vibe Kanban, Fireworks AI).
+
+# STACK
+- TypeScript
+- Node.js async/await
+
+# ARTIFACTS
+- `loop.ts`: Main orchestration logic (implementation ONLY, no tests)
+
+# FUNCTIONAL REQUIREMENTS
+- Accept BuildConfig: specName, budget, maxAttempts, targetCoverage
+- Execute workflow:
+  1. Announce "Build started" via voice
+  2. Update Kanban to "planning" with description (e.g., "Initializing build")
+  3. Run PDD using: `const pddResult = await executePDD({ command, specName: config.specName, budget: config.budget, targetCoverage: config.targetCoverage })`
+     - First attempt: command = 'sync'
+     - Retries: command = 'fix'
+  4. Check if tests passed using `pddResult.testsPass` (note: testsPass not testsPassed)
+  5. If failed and attempts remain: retry after 5s delay
+  6. If succeeded: generate diagram, announce success
+  7. If all attempts exhausted: announce failure
+- Log all state to Convex (future integration)
+- Track total cost across attempts
+- Track duration from start to end
+- Return BuildResult with success status, cost, duration, attempts
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Graceful handling of missing API keys
+- Clear console output with progress indicators
+- Exponential backoff between retries (5s, 10s, 15s)
+- All integrations fail gracefully (don't block main flow)
+- Max execution time: 15 minutes
+
+# INTERFACE
+```typescript
+export interface BuildConfig {
+  specName: string;
+  budget: number;
+  maxAttempts: number;
+  targetCoverage: number;
+}
+
+export interface BuildResult {
+  success: boolean;
+  status: 'done' | 'error' | 'building' | 'testing';
+  totalCost: number;
+  duration: number;
+  error?: string;
+  attempts: number;
+}
+
+export async function runBuild(config: BuildConfig): Promise<BuildResult>
+```
+
+# DEPENDENCIES
+Import from:
+- `./tools/pdd`: executePDD(config: PDDConfig) - returns PDDResult with testsPass boolean (note: testsPass not testsPassed)
+  - PDDConfig has: { command: 'sync' | 'fix' | 'generate', specName: string, budget: number, targetCoverage: number }
+  - PDDResult has: { success: boolean, testsPass: boolean, cost: number, output: string, error?: string }
+- `./tools/voice`: announceVoice(message: string) - returns Promise<void>
+- `./tools/kanban`: updateKanban(taskId: string, state: TaskState, description: string) - returns Promise<void>
+- `./tools/diagram`: generateDiagram(specName: string) - returns Promise<void>
+
+# TESTS
+- Succeeds on first attempt when tests pass
+- Retries when tests fail, succeeds on retry
+- Fails after maxAttempts exhausted
+- Tracks cost correctly across attempts
+- Calls all integrations (mocked)
+- Handles integration failures gracefully
+
+# VERIFICATION
+✅ Full build with passing tests completes in <5 minutes
+✅ Failed builds retry up to maxAttempts
+✅ All sponsor tools are called
+✅ Cost tracking is accurate
+✅ Console output is clear and helpful
+✅ Tests pass with 80%+ coverage
+
+# NOTES
+- Use async/await throughout
+- Log timestamps for each phase
+- Include emoji in console output for visibility
+- Don't throw errors - return BuildResult with error field

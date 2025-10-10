@@ -1,0 +1,175 @@
+name: foreman-agent
+version: 0.1.0
+description: AI agent that orchestrates software generation from Product Design Documents
+
+# Runtime configuration
+runtime:
+  type: dedalus
+  node_version: "18"
+
+# Model configuration
+model:
+  provider: openai
+  name: gpt-4-turbo-preview
+  temperature: 0.7
+  max_tokens: 4000
+
+# Environment variables (load from secrets in production)
+environment:
+  - OPENAI_API_KEY
+  - ELEVENLABS_API_KEY
+  - FIREWORKS_API_KEY
+  - VIBE_KANBAN_BASE_URL
+  - VIBE_KANBAN_TOKEN
+  - CONVEX_DEPLOYMENT
+  - CONVEX_URL
+  - PDD_PATH
+
+# Tools available to the agent
+tools:
+  - name: pdd_build
+    description: Execute a PDD build from a design spec
+    type: function
+    function:
+      command: foreman
+      args:
+        - build
+        - "{{spec_name}}"
+        - --budget
+        - "{{budget}}"
+        - --attempts
+        - "{{attempts}}"
+        - --coverage
+        - "{{coverage}}"
+    parameters:
+      spec_name:
+        type: string
+        description: Name of the spec file (without extension)
+        required: true
+      budget:
+        type: number
+        description: Maximum budget for generation
+        default: 10.0
+      attempts:
+        type: number
+        description: Maximum retry attempts
+        default: 3
+      coverage:
+        type: number
+        description: Target test coverage percentage
+        default: 80
+
+  - name: convex_query
+    description: Query Convex database for run history and status
+    type: http
+    http:
+      method: POST
+      url: "{{CONVEX_URL}}/api/query"
+      headers:
+        Content-Type: application/json
+      body:
+        path: "{{query_path}}"
+        args: "{{query_args}}"
+    parameters:
+      query_path:
+        type: string
+        description: Convex query path (e.g., "runs:listRuns")
+        required: true
+      query_args:
+        type: object
+        description: Query arguments
+        default: {}
+
+  - name: announce_milestone
+    description: Announce a build milestone using voice
+    type: function
+    function:
+      command: node
+      args:
+        - -e
+        - |
+          const { announceVoice } = require('./packages/foreman/dist/tools/voice');
+          announceVoice('{{message}}').then(() => process.exit(0));
+    parameters:
+      message:
+        type: string
+        description: Message to announce
+        required: true
+
+# Triggers for the agent
+triggers:
+  - type: http
+    path: /build
+    method: POST
+    description: Trigger a build via HTTP webhook
+    body_schema:
+      spec_name:
+        type: string
+        required: true
+      budget:
+        type: number
+        default: 10.0
+      attempts:
+        type: number
+        default: 3
+      coverage:
+        type: number
+        default: 80
+
+  - type: schedule
+    cron: "0 */6 * * *"
+    description: Check for updated specs every 6 hours
+    enabled: false
+
+  - type: manual
+    description: Manually trigger builds from dashboard
+
+# Workflow definition
+workflow:
+  on_build_request:
+    - step: validate_spec
+      tool: pdd_build
+      on_success: update_dashboard
+      on_failure: notify_error
+      retry:
+        max_attempts: 3
+        backoff: exponential
+
+    - step: update_dashboard
+      tool: convex_query
+      parameters:
+        query_path: runs:listRuns
+        query_args:
+          limit: 1
+
+    - step: notify_error
+      tool: announce_milestone
+      parameters:
+        message: "Build failed. Check logs for details."
+
+# Resource limits
+limits:
+  timeout: 900  # 15 minutes
+  memory: 2048  # 2GB
+  cpu: 2        # 2 cores
+
+# Logging configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - convex
+
+# Metadata
+metadata:
+  hackathon: SF Tech Week Agent Builders 2024
+  sponsors:
+    - Dedalus Labs
+    - Convex
+    - OpenAI
+    - ElevenLabs
+    - Fireworks AI
+    - Vibe Kanban
+  demo_url: https://foreman-agent.demo
+  repository: https://github.com/yourusername/pdd-foreman-agent

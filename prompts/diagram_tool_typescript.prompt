@@ -1,0 +1,85 @@
+**IMPORTANT**: Generate ONLY the implementation code, NOT test code. Tests are handled separately.
+
+# GOAL
+Build a tool that generates system architecture diagrams using Fireworks AI (or fallback to ASCII art).
+
+# CONTEXT
+This creates a visual representation of the system architecture. Fireworks AI may not be configured, so a text/ASCII fallback is essential.
+
+# STACK
+- TypeScript
+- axios for HTTP requests (if using Fireworks AI)
+- Node.js fs/promises for file writing
+
+# ARTIFACTS
+- `tools/diagram.ts`: Diagram generation tool implementation ONLY (no tests in this file)
+
+# FUNCTIONAL REQUIREMENTS
+- Accept specName
+- Check if FIREWORKS_API_KEY is set
+- If not set:
+  - Generate ASCII art diagram
+  - Save to `apps/web/public/diagram.txt`
+- If set:
+  - Call Fireworks AI to generate image
+  - Save to `apps/web/public/diagram.png`
+- Always log what was generated
+- Return successfully
+
+# ASCII_DIAGRAM_TEMPLATE
+```
+System Architecture for {specName}:
+
+┌─────────────────────────────────────────────────────────┐
+│                   User Interface                        │
+│              (Next.js Dashboard)                        │
+└───────────────────┬─────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│              Foreman Agent Core                         │
+│            (Orchestration Loop)                         │
+└──┬──────────┬──────────┬──────────┬───────────────────┘
+   │          │          │          │
+   ▼          ▼          ▼          ▼
+┌─────┐  ┌────────┐  ┌───────┐  ┌────────┐
+│ PDD │  │ Convex │  │ Voice │  │ Kanban │
+│ CLI │  │   DB   │  │  TTS  │  │  Board │
+└─────┘  └────────┘  └───────┘  └────────┘
+```
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Fast execution (<5s)
+- Graceful fallback to ASCII
+- Don't block if directory doesn't exist (create it)
+- Clear console output
+
+# INTERFACE
+```typescript
+export async function generateDiagram(specName: string): Promise<void>
+```
+
+# ERROR_HANDLING
+- No API key → use ASCII fallback
+- API error → use ASCII fallback
+- Directory doesn't exist → create it
+- Write error → log warning, continue
+
+# TESTS
+- Generates ASCII diagram without API key
+- Creates output directory if needed
+- Handles write errors gracefully
+- (Optional) Calls Fireworks AI when configured
+
+# VERIFICATION
+✅ Works without API key (ASCII fallback)
+✅ Saves diagram to correct location
+✅ Creates directory if needed
+✅ Never crashes
+✅ Tests pass with 80%+ coverage
+
+# NOTES
+- Use env var: FIREWORKS_API_KEY
+- ASCII art is perfectly fine for hackathon demo
+- Make the ASCII diagram look nice with box drawing characters
+- Output path: apps/web/public/diagram.txt or diagram.png

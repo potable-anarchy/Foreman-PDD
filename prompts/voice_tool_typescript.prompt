@@ -1,0 +1,82 @@
+**IMPORTANT**: Generate ONLY the implementation code, NOT test code. Tests are handled separately.
+
+# GOAL
+Build an integration with ElevenLabs API for text-to-speech milestone announcements.
+
+# CONTEXT
+This tool announces key build events using voice synthesis. It should gracefully degrade to console logging if API keys aren't configured (hackathon demo might not have all keys).
+
+# STACK
+- TypeScript
+- axios for HTTP requests
+- ElevenLabs API v1
+
+# ARTIFACTS
+- `tools/voice.ts`: ElevenLabs integration implementation ONLY (no tests in this file)
+
+# FUNCTIONAL REQUIREMENTS
+- Accept a text message to announce
+- Check if ELEVENLABS_API_KEY is set
+- If not set: log to console with 🎙️ emoji and skip API call
+- If set: call ElevenLabs TTS API
+  - POST to `https://api.elevenlabs.io/v1/text-to-speech/{voice_id}`
+  - Use voice_id from env or default
+  - Send text + voice settings
+  - Get audio back as arraybuffer
+  - Log success (don't actually play audio - just confirm generation)
+- Always return successfully (never throw)
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Fast timeout (10s max)
+- Fail gracefully on API errors
+- Don't block main flow
+- Clear console output for demo
+
+# INTERFACE
+```typescript
+export async function announceVoice(message: string): Promise<void>
+```
+
+# API_DETAILS
+Endpoint: `POST https://api.elevenlabs.io/v1/text-to-speech/{voice_id}`
+Headers:
+- `xi-api-key`: API key
+- `Content-Type`: application/json
+
+Body:
+```json
+{
+  "text": "Build started",
+  "model_id": "eleven_monolingual_v1",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.5
+  }
+}
+```
+
+Response: audio/mpeg arraybuffer
+
+# ERROR_HANDLING
+- No API key → log warning, continue
+- Network error → log warning, continue
+- Rate limit → log warning, continue
+- Invalid voice_id → log warning, continue
+
+# TESTS
+- Logs to console when API key missing
+- Calls correct endpoint when key present
+- Handles API errors gracefully
+- Never throws errors
+
+# VERIFICATION
+✅ Works without API key (degrades gracefully)
+✅ Calls ElevenLabs API when configured
+✅ Logs clear messages
+✅ Never crashes
+✅ Tests pass with 80%+ coverage
+
+# NOTES
+- Use env vars: ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID
+- Always log message to console (even if API succeeds)
+- In real demo, actual audio playback is optional

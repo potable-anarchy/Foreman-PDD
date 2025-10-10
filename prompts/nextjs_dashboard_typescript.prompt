@@ -1,0 +1,98 @@
+**IMPORTANT**: Generate ONLY the `pages/index.tsx` file. The _app.tsx and RunList.tsx files will be generated separately.
+
+# GOAL
+Build a Next.js dashboard that displays build history and run status in real-time using Convex.
+
+# CONTEXT
+This is the visual interface for monitoring Foreman builds. It should be simple, clear, and update in real-time as builds run.
+
+# STACK
+- Next.js 14 (App Router or Pages Router)
+- React
+- Convex React client
+- TypeScript
+
+# ARTIFACTS
+- `pages/index.tsx`: Main dashboard page ONLY (implementation only, no tests)
+
+NOTE: This file should import RunList from '../components/RunList' - assume that file exists
+
+# FUNCTIONAL REQUIREMENTS
+
+**_app.tsx:**
+- Set up ConvexProvider
+- Initialize ConvexReactClient with NEXT_PUBLIC_CONVEX_URL
+- Wrap entire app
+
+**index.tsx:**
+- Show header: "🏗️ PDD Foreman Agent"
+- Use useQuery to fetch runs (limit 20)
+- Show loading state while fetching
+- Show empty state if no runs
+- Render RunList component with runs
+- Show "Quick Start" section with example commands
+- Show sponsor credits in footer
+
+**RunList.tsx:**
+- Accept runs array as prop
+- Render each run as a card
+- Show: spec name, status badge, summary, timestamps, cost, attempts
+- Color-code status badges:
+  - planning: blue
+  - building: orange
+  - testing: purple
+  - done: green
+  - error: red
+- Format timestamps as readable dates
+- Show duration (endedAt - startedAt)
+- Use emoji for status indicators
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Responsive design (mobile-friendly)
+- Real-time updates via Convex subscriptions
+- Fast load times
+- Clean, hackathon-style UI (simple is fine)
+- No complex styling (inline styles or simple CSS)
+
+# INTERFACE
+```typescript
+// pages/_app.tsx
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
+
+// pages/index.tsx
+import { useQuery } from 'convex/react';
+import { api } from '../convex/_generated/api';
+
+// components/RunList.tsx
+interface Run {
+  _id: Id<'runs'>;
+  specName: string;
+  startedAt: number;
+  endedAt?: number;
+  status: 'planning' | 'building' | 'testing' | 'done' | 'error';
+  summary: string;
+  totalCost?: number;
+  attempts?: number;
+}
+```
+
+# STYLING
+Use inline styles or minimal CSS. Example color scheme:
+- Background: #ffffff
+- Text: #333333
+- Borders: #dddddd
+- Status colors: as specified above
+
+# VERIFICATION
+✅ Dashboard loads without errors
+✅ Shows real-time data from Convex
+✅ Updates automatically as builds run
+✅ Displays all run information clearly
+✅ Responsive on mobile
+✅ Empty state works correctly
+
+# NOTES
+- Keep it simple - this is a hackathon project
+- Focus on functionality over fancy design
+- Use Next.js 14 patterns (App Router preferred but Pages Router fine)
+- NEXT_PUBLIC_CONVEX_URL must be in .env.local

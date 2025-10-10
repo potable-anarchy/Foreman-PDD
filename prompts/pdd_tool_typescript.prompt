@@ -1,0 +1,82 @@
+# GOAL
+Build a wrapper that spawns the PDD CLI as a subprocess, streams output, and parses results.
+
+**IMPORTANT**: Generate ONLY the implementation code, NOT test code. The output should be production code that can be imported and used.
+
+# CONTEXT
+This tool executes the actual `pdd` command (sync, fix, generate) and captures all output to determine success/failure and extract cost information.
+
+# STACK
+- TypeScript
+- Node.js child_process
+- spawn (not exec - for streaming)
+
+# ARTIFACTS
+- `tools/pdd.ts`: PDD CLI wrapper implementation ONLY (no tests in this file)
+
+# FUNCTIONAL REQUIREMENTS
+- Execute PDD commands with correct syntax based on command type:
+  - sync: `pdd --local --force sync <specName> --target-coverage <coverage>`
+  - generate: `pdd --local --force generate prompts/<specName>_typescript.prompt`
+  - fix: `pdd fix prompts/<specName>_typescript.prompt <specName>.ts test_<specName>.ts error.log --budget <budget> --max-attempts 3`
+    (Note: fix command has different syntax, no --local --force, no --target-coverage)
+- Set PDD_PATH environment variable
+- Stream stdout/stderr to console in real-time
+- Capture all output for parsing
+- Parse output to determine:
+  - Success: exit code 0
+  - Tests pass: look for "Overall status: Success" or "✅"
+  - Cost: extract from "Total cost: $X.XX"
+- Return PDDResult with success, testsPass, cost, output, error
+
+# NON_FUNCTIONAL_REQUIREMENTS
+- Stream output in real-time (don't buffer)
+- Handle PDD not found error gracefully
+- Timeout after 10 minutes
+- Preserve colored output if supported
+
+# INTERFACE
+```typescript
+export interface PDDConfig {
+  command: 'sync' | 'fix' | 'generate';
+  specName: string;
+  budget: number;
+  targetCoverage: number;
+}
+
+export interface PDDResult {
+  success: boolean;
+  testsPass: boolean;
+  cost: number;
+  output: string;
+  error?: string;
+}
+
+export async function executePDD(config: PDDConfig): Promise<PDDResult>
+```
+
+# ERROR_HANDLING
+- PDD not installed → clear error message
+- PDD_PATH not set → use process.cwd()
+- Exit code non-zero → capture in error field
+- Timeout → kill process and return timeout error
+
+# TESTS
+- Spawns correct command with correct args
+- Streams output to console
+- Parses success correctly
+- Parses cost correctly
+- Handles failures gracefully
+- Handles missing PDD binary
+
+# VERIFICATION
+✅ Executes `pdd sync` successfully
+✅ Output appears in real-time
+✅ Parses results correctly
+✅ Handles errors without crashing
+✅ Tests pass with 80%+ coverage
+
+# NOTES
+- Use spawn, not exec (for streaming)
+- Don't rely on specific PDD output format too heavily
+- Log the exact command being run for debugging

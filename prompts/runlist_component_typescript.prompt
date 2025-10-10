@@ -1,0 +1,69 @@
+**IMPORTANT**: Generate ONLY the RunList React component. This is a presentation component for displaying build runs.
+
+# GOAL
+Create a React component that displays a list of Convex build runs with status badges and details.
+
+# CONTEXT
+This component receives run data from Convex and displays it in a clean, readable format with color-coded status badges.
+
+# STACK
+- React
+- TypeScript
+- Inline styles (no CSS imports)
+
+# ARTIFACTS
+- `components/RunList.tsx`: Build run list component (implementation only, no tests)
+
+# FUNCTIONAL REQUIREMENTS
+- Accept runs prop of type Run[]
+- Display each run as a card with:
+  - Spec name as heading
+  - Color-coded status badge with emoji
+  - Summary text in gray box
+  - Duration and cost on right side
+  - Start/end timestamps at bottom
+  - Attempt count if > 1
+- Use status colors:
+  - planning: blue (#3b82f6, bg #eff6ff, emoji 📋)
+  - building: orange (#f59e0b, bg #fffbeb, emoji 🔨)
+  - testing: purple (#8b5cf6, bg #f5f3ff, emoji 🧪)
+  - done: green (#10b981, bg #ecfdf5, emoji ✅)
+  - error: red (#ef4444, bg #fef2f2, emoji ❌)
+
+# INTERFACE
+```typescript
+import { Id } from '../convex/_generated/dataModel';
+
+interface Run {
+  _id: Id<'runs'>;
+  specName: string;
+  startedAt: number;
+  endedAt?: number;
+  status: 'planning' | 'building' | 'testing' | 'done' | 'error';
+  summary: string;
+  totalCost?: number;
+  attempts?: number;
+}
+
+interface RunListProps {
+  runs: Run[];
+}
+
+export default function RunList({ runs }: RunListProps) {
+  // Implementation
+}
+```
+
+# HELPER FUNCTIONS
+Include these utility functions:
+- formatDate(timestamp: number): string - converts to locale string
+- formatDuration(startedAt: number, endedAt?: number): string - shows duration or "Running..."
+- formatCost(cost?: number): string - shows "$X.XXXX" or "Free"
+
+# VERIFICATION
+✅ Accepts runs array prop
+✅ Displays all run details
+✅ Color-codes status badges correctly
+✅ Shows duration, cost, attempts
+✅ Formats timestamps properly
+✅ Clean responsive layout
