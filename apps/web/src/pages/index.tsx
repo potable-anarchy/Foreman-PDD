@@ -8,7 +8,7 @@ import RunList from "../components/RunList";
  */
 export default function Home() {
   // Query the latest 20 runs from the database
-  const runs = useQuery(api.runs.list, { limit: 20 });
+  const runs = useQuery(api.runs.listRuns, { limit: 20 });
 
   return (
     <div
