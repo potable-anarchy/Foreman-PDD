@@ -1,0 +1,32 @@
+# Simple Hello World Webpage
+
+## Overview
+Build a simple static HTML webpage that displays "HELLO!" in large text.
+
+## Requirements
+- Single HTML file: `index.html`
+- Display "HELLO!" in the center of the page
+- Large, bold text
+- Clean, minimal styling
+- No external dependencies
+- Responsive design
+
+## Technical Specs
+- HTML5 doctype
+- Centered content (horizontally and vertically)
+- Font size: 72px or larger
+- Text color: bright blue (#0066cc)
+- Background: white
+- Font family: system fonts (Arial, sans-serif)
+
+## Testing
+- File should be valid HTML5
+- Should display correctly in any modern browser
+- Text should be centered both horizontally and vertically
+- Should work without internet connection (no CDN dependencies)
+
+## Success Criteria
+- Single `index.html` file created
+- Opens in browser and displays "HELLO!" prominently
+- Clean, readable code
+- No console errors

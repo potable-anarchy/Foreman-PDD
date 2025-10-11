@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: white;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100%;
+        }
+        
+        .hello-text {
+            font-size: 72px;
+            font-weight: bold;
+            color: #0066cc;
+            text-align: center;
+        }
+        
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .hello-text {
+                font-size: 48px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hello-text {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="hello-text">HELLO!</h1>
+    </div>
+</body>
+</html>
