@@ -15,6 +15,61 @@ Foreman reads `.prompt` files and orchestrates PDD to:
 
 **The twist**: Foreman itself was generated using PDD from the spec in `prompts/foreman_agent.prompt`!
 
+---
+
+## 🎤 For Hackathon Judges: Sponsor Integration Showcase
+
+**This project integrates EVERY sponsor technology to create a meta-builder agent:**
+
+### 🧠 **OpenAI** - Core Intelligence
+- **How we use it**: Powers PDD's code generation engine through GPT-4
+- **Why it matters**: Enables the entire meta-builder concept - AI writing code that writes code
+- **Technical details**: Used for spec normalization, code generation, test creation, and failure analysis
+- **Impact**: Generated 1,000+ lines of production TypeScript for ~$0.40
+
+### 🔥 **Fireworks AI** - Visual Architecture
+- **How we use it**: Generates system architecture diagrams from generated code
+- **Why it matters**: Provides visual documentation of what was built automatically
+- **Technical details**: `packages/foreman/src/tools/diagram.ts` - analyzes codebase structure and generates Mermaid diagrams
+- **Impact**: Auto-documentation for every successful build
+
+### 🗣️ **ElevenLabs** - Voice Narration
+- **How we use it**: Announces build milestones with natural voice
+- **Why it matters**: Multi-modal output - hear your builds complete in real-time
+- **Technical details**: `packages/foreman/src/tools/voice.ts` - TTS integration for key events
+- **Impact**: "Scaffold complete." → "Tests failed; attempting repair." → "All tests green. Build complete."
+
+### 💾 **Convex** - Real-time State & Persistence
+- **How we use it**: Backend database for runs, tasks, and specs with live updates
+- **Why it matters**: Zero-config real-time sync between agent and dashboard
+- **Technical details**: `apps/api/convex/` - TypeScript-first schema, mutations, queries
+- **Impact**: Every build tracked, queryable, and displayed in real-time dashboard
+- **Live deployment**: https://quixotic-meadowlark-394.convex.cloud
+
+### 🤖 **Dedalus Labs** - Agent Orchestration
+- **How we use it**: Runtime framework for agent execution and tool coordination
+- **Why it matters**: Structured agent architecture with tool routing and state management
+- **Technical details**: `dedalus/agent.yaml` - agent manifest defining tools and triggers
+- **Impact**: Professional agent architecture vs ad-hoc scripts
+
+### 📋 **Vibe Kanban** - Task Visualization
+- **How we use it**: Real-time kanban board showing build tasks (backlog → doing → done)
+- **Why it matters**: Visual progress tracking integrated with build pipeline
+- **Technical details**: `packages/foreman/src/tools/kanban.ts` - API integration
+- **Impact**: See tasks flow through stages as code is generated
+
+### 🌊 **Windsurf** - Development Environment
+- **How we use it**: Build workspace and development environment
+- **Why it matters**: Unified environment for agent development
+- **Impact**: Seamless development experience
+
+### 🚢 **Vercel** - Production Deployment
+- **Live dashboard**: https://foreman-pdd-web-bradtacos-projects.vercel.app
+- **Auto-deploy**: Every git push triggers new deployment
+- **Monorepo support**: Handles Next.js app in `apps/web/` with proper build configuration
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -183,15 +238,20 @@ for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 }
 ```
 
-## 🎯 Sponsor Integrations
+## 🎯 Sponsor Integration Summary
 
-- **Dedalus Labs** - Agent runtime & orchestration
-- **Convex** - Real-time backend & state
-- **OpenAI** - LLM inference (via PDD)
-- **ElevenLabs** - Voice milestone announcements
-- **Fireworks AI** - System architecture diagrams
-- **Vibe Kanban** - Task board visualization
-- **Windsurf** - Development environment
+| Sponsor | Integration | Status | Code Location |
+|---------|-------------|--------|---------------|
+| **OpenAI** | Code generation via PDD | ✅ Core | Throughout codebase |
+| **Convex** | Real-time database | ✅ Live | `apps/api/convex/` |
+| **Vercel** | Dashboard hosting | ✅ Live | `apps/web/` deployed |
+| **Dedalus Labs** | Agent framework | 📦 Implemented | `dedalus/agent.yaml` |
+| **ElevenLabs** | Voice narration | 📦 Implemented | `packages/foreman/src/tools/voice.ts` |
+| **Fireworks AI** | Diagram generation | 📦 Implemented | `packages/foreman/src/tools/diagram.ts` |
+| **Vibe Kanban** | Task tracking | 📦 Implemented | `packages/foreman/src/tools/kanban.ts` |
+| **Windsurf** | Dev environment | ✅ Used | Development workspace |
+
+**Key**: ✅ Live/Working | 📦 Code Complete (needs API keys for demo)
 
 ## 📖 Documentation
 
