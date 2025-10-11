@@ -125,10 +125,7 @@ export const updateTask = mutation({
       Object.entries(updates).filter(([_, value]) => value !== undefined),
     );
 
-    await ctx.db.patch(taskId, {
-      ...filteredUpdates,
-      updatedAt: Date.now(),
-    });
+    await ctx.db.patch(taskId, filteredUpdates);
     return taskId;
   },
 });
