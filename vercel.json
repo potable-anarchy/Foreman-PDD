@@ -1,7 +1,0 @@
-{
-  "buildCommand": "pnpm install && cd apps/web && pnpm build",
-  "outputDirectory": "apps/web/.next",
-  "devCommand": "cd apps/web && pnpm dev",
-  "installCommand": "pnpm install --filter=@foreman/web...",
-  "framework": "nextjs"
-}
