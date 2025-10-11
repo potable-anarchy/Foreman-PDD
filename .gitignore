@@ -62,3 +62,4 @@ runlist_component.ts
 convex_schema.ts
 convex_functions.ts
 .vercel
+# Dashboard now connected to Convex
