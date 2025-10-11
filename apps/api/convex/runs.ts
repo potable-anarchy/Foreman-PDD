@@ -18,7 +18,7 @@ export const createRun = mutation({
     const runId = await ctx.db.insert("runs", {
       specName: args.specName,
       summary: args.summary,
-      status: "running",
+      status: "planning",
       startedAt: Date.now(),
       totalCost: 0,
       attempts: 1,
@@ -40,7 +40,15 @@ export const createRun = mutation({
 export const updateRun = mutation({
   args: {
     runId: v.id("runs"),
-    status: v.optional(v.union(v.literal("running"), v.literal("completed"), v.literal("failed"))),
+    status: v.optional(
+      v.union(
+        v.literal("planning"),
+        v.literal("building"),
+        v.literal("testing"),
+        v.literal("done"),
+        v.literal("error"),
+      ),
+    ),
     summary: v.optional(v.string()),
     totalCost: v.optional(v.number()),
     attempts: v.optional(v.number()),
@@ -48,10 +56,10 @@ export const updateRun = mutation({
   },
   handler: async (ctx, args) => {
     const { runId, ...updates } = args;
-    
+
     // Filter out undefined values to avoid overwriting with undefined
     const filteredUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, value]) => value !== undefined)
+      Object.entries(updates).filter(([_, value]) => value !== undefined),
     );
 
     await ctx.db.patch(runId, filteredUpdates);
@@ -72,10 +80,10 @@ export const createTask = mutation({
     runId: v.id("runs"),
     title: v.string(),
     state: v.union(
-      v.literal("pending"),
-      v.literal("running"), 
-      v.literal("completed"),
-      v.literal("failed")
+      v.literal("backlog"),
+      v.literal("doing"),
+      v.literal("done"),
+      v.literal("error"),
     ),
     diffSummary: v.optional(v.string()),
   },
@@ -102,19 +110,19 @@ export const updateTask = mutation({
   args: {
     taskId: v.id("tasks"),
     state: v.union(
-      v.literal("pending"),
-      v.literal("running"),
-      v.literal("completed"), 
-      v.literal("failed")
+      v.literal("backlog"),
+      v.literal("doing"),
+      v.literal("done"),
+      v.literal("error"),
     ),
     diffSummary: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { taskId, ...updates } = args;
-    
+
     // Filter out undefined values to avoid overwriting with undefined
     const filteredUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, value]) => value !== undefined)
+      Object.entries(updates).filter(([_, value]) => value !== undefined),
     );
 
     await ctx.db.patch(taskId, {
@@ -138,13 +146,13 @@ export const listRuns = query({
   },
   handler: async (ctx, args) => {
     const limit = args.limit ?? 50;
-    
+
     const runs = await ctx.db
       .query("runs")
       .withIndex("by_startedAt")
       .order("desc")
       .take(limit);
-    
+
     return runs;
   },
 });
@@ -179,7 +187,7 @@ export const getRunsBySpec = query({
       .withIndex("by_specName", (q) => q.eq("specName", args.specName))
       .order("desc")
       .collect();
-    
+
     return runs;
   },
 });
@@ -199,7 +207,7 @@ export const getTasksByRun = query({
       .withIndex("by_runId", (q) => q.eq("runId", args.runId))
       .order("asc")
       .collect();
-    
+
     return tasks;
   },
 });
